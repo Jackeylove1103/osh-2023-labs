@@ -1,9 +1,9 @@
-OBJS = myshell
+OBJS = shell
 CC = gcc
 CFLAGS = -Wall
 
-.PHONY : myshell
-myshell : $(OBJS)
-	$(CC) $(CFLAGS) myshell.c -o myshell
+.PHONY : shell
+shell : $(OBJS)
+	$(CC) $(CFLAGS) shell.c -o shell
 clean :
-	rm myshell
+	rm shell
