@@ -24,6 +24,6 @@
 
 # 测试效果
 
-![siege]([C:\Users\Lenovo\Desktop\siege.png](https://github.com/PB21151767/osh-2023-labs/blob/master/siege.png))
+![siege](https://github.com/PB21151767/osh-2023-labs/blob/master/siege.png))
 
 分析：根据siege测试结果可以看到transactions都能成功，说明正确性没有问题，性能参数如上所示，可能可以通过拓宽线程池或任务队列的数量来实现对资源的充分利用，从而使得性能可以进一步提高。
