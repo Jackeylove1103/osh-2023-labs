@@ -44,14 +44,12 @@ typedef struct {
     int front;  //head pointer
     int rear; // tail pointer
     int count_task;
-    int max_task;
     pthread_mutex_t mutex;
     pthread_cond_t not_empty;
     pthread_cond_t not_full;
     pthread_t *threads;
     int work_threads;
     pthread_mutex_t work_threads_lock;
-    int max_threads;
 } thread_pool;
 
 //get task from thread_pool
@@ -67,7 +65,7 @@ void* get(void *args)
         task= (task_t*)malloc(sizeof(task_t));
         task->fun = pool->tasks[pool->front].fun;
         task->args= pool->tasks[pool->front].args;
-        pool->front = (pool->front + 1) % pool->max_task;
+        pool->front = (pool->front + 1) % TASK_QUEUE_SIZE;
         pool->count_task--;
         // deliver signal
         pthread_cond_signal(&pool->not_full);
@@ -81,12 +79,12 @@ void* get(void *args)
 void *add(thread_pool* pool, void(*fun)(void*), void* args)
 {  //lock mutex
     pthread_mutex_lock(&pool->mutex);
-    while (pool->count_task == pool->max_task ) {
+    while (pool->count_task == TASK_QUEUE_SIZE ) {
         pthread_cond_wait(&pool->not_full, &pool->mutex);
     }
     pool->tasks[pool->rear].fun = fun;
     pool->tasks[pool->rear].args= args;
-    pool->rear = (pool->rear+ 1) % pool->max_task;
+    pool->rear = (pool->rear+ 1) % TASK_QUEUE_SIZE;
     pool->count_task++;
     pthread_cond_signal(&pool->not_empty);
     pthread_mutex_unlock(&pool->mutex);
@@ -95,8 +93,6 @@ void *add(thread_pool* pool, void(*fun)(void*), void* args)
 void thread_pool_init(thread_pool* init_pool)
 {   init_pool->tasks=  (task_t *)malloc(TASK_QUEUE_SIZE*sizeof(task_t));
     init_pool->front=init_pool->rear=init_pool->work_threads=0;
-    init_pool->max_task=TASK_QUEUE_SIZE;
-    init_pool->max_threads=THREAD_POOL_SIZE; 
     pthread_mutex_init(&init_pool->mutex, NULL);
     pthread_cond_init(&init_pool->not_empty, NULL);
     pthread_cond_init(&init_pool->not_full, NULL);
